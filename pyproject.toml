@@ -6,6 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "pc2bs"
 version = "0.1.0"
 description = "CLI: point-cloud Spacewalk .sw → ball-and-stick (h5py, one-way)."
+readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "h5py>=3.10",
