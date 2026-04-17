@@ -19,7 +19,13 @@ cd /path/to/pc2bs
 python3 -m pip install -e .
 ```
 
-The `-e` (editable) flag means `git pull` picks up source changes immediately. If `pyproject.toml` dependencies change, re-run `python3 -m pip install -e .` (or `--force-reinstall -e .` for a clean refresh).
+The `-e` (editable) flag means `git pull` picks up source changes immediately — you do not need to reinstall after every update. The only time you need to re-run the install command is when the project's **required libraries** change (for example, a newer minimum version of `h5py` or `numpy`). When that happens, run the same command again:
+
+```bash
+python3 -m pip install -e .
+```
+
+**A note on shared environments.** If your active environment already holds other tools (for example `streamlit`, `numba`, or a Jupyter stack), installing pc2bs into it may pull in newer versions of `numpy` or other shared libraries and trigger pip warnings about **dependency conflicts** with those other tools. pc2bs itself will still work, but the other tools may break. If you hit this, use **Option B** below to install pc2bs into its own dedicated environment. Avoid `pip install --force-reinstall` in a shared environment — it aggressively upgrades transitive libraries and is the most common cause of these conflicts.
 
 ### Option B — You do not have a Python environment (use Conda)
 
@@ -82,7 +88,7 @@ git pull
 python3 -m pip install -e .
 ```
 
-Use `python3 -m pip install --force-reinstall -e .` if dependencies changed and you want a clean refresh.
+Plain `pip install -e .` leaves already-satisfied libraries alone, so it is safe to run in a shared environment. Avoid `--force-reinstall` unless you are in a dedicated environment — it can upgrade shared libraries (e.g. `numpy`) and break other tools installed alongside pc2bs.
 
 ---
 
@@ -104,12 +110,18 @@ Activate the environment you installed into (`conda activate pc2bs`, or `source 
 
 ### Errors about HDF5 or missing modules
 
-Reinstall so dependencies are applied:
+With your environment activated, reinstall so dependencies are applied:
 
 ```bash
 cd /path/to/pc2bs
-python3 -m pip install --force-reinstall -e .
+python3 -m pip install -e .
 ```
+
+If that does not resolve the problem and you are using a **dedicated** pc2bs environment (Option B, or a venv used only for pc2bs), you can do a clean refresh with `python3 -m pip install --force-reinstall -e .`. Do not use `--force-reinstall` in a shared environment — it can upgrade `numpy` and other libraries in ways that break other tools installed alongside pc2bs.
+
+### `pip` warns about dependency conflicts during install
+
+If the install log ends with lines like `ERROR: pip's dependency resolver … this behaviour is the source of the following dependency conflicts` naming packages such as `streamlit`, `numba`, `protobuf`, or `numpy`, pc2bs itself is installed — but the environment you installed into has **other tools** whose pinned versions disagree with what pip just pulled in. Run `pc2bs --version` to confirm pc2bs works. The cleanest fix is to reinstall pc2bs into a dedicated environment (Option B), so its dependencies cannot clobber the other tools.
 
 ### Spacewalk still will not open the output file
 
