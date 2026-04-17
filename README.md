@@ -248,6 +248,35 @@ pytest
 
 ---
 
+## Versioning and releases
+
+The **Python package version** (what `pc2bs --version` and `pip show pc2bs` report) comes from **Git**, not from a hand-edited string in the source tree. [setuptools-scm](https://github.com/pypa/setuptools_scm) reads your repository’s **annotated or lightweight tags** (for example `v0.2.0`) when the package is built or installed.
+
+**Typical release workflow**
+
+1. Commit the changes you want in the release.
+2. Create a tag whose name matches the version you want (common convention: **`v` + semver**, e.g. `v0.2.0`):
+
+   ```bash
+   git tag -a v0.2.0 -m "Release 0.2.0"
+   git push origin main
+   git push origin v0.2.0
+   ```
+
+3. On GitHub, create a **Release** from that tag (the release “name” is usually the same as the tag).
+
+4. Anyone who installed with **pipx** should refresh so the new version is baked into pipx’s metadata (especially after a new tag):
+
+   ```bash
+   pipx reinstall pc2bs
+   ```
+
+   Editable installs (`pipx install -e …`) pick up **code** changes on `git pull` immediately, but the **reported version string** only updates after metadata is regenerated—`pipx reinstall pc2bs` does that.
+
+If you run from a checkout **without** installing the package (`pip install -e .` / pipx), `pc2bs --version` may show `0.0.0+not-installed`; use a normal install for a meaningful version.
+
+---
+
 ## Format reference
 
 Spacewalk documents the `.sw` layout here:
