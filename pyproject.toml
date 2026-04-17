@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pc2bs"
 version = "0.1.0"
-description = "CLI: convert a point-cloud Spacewalk .sw file to ball-and-stick (pc2bs, h5py, one-way)."
+description = "CLI: point-cloud Spacewalk .sw → ball-and-stick (h5py, one-way)."
 requires-python = ">=3.10"
 dependencies = [
     "h5py>=3.10",
