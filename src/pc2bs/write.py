@@ -5,7 +5,7 @@ from pathlib import Path
 import h5py
 import numpy as np
 
-from pc2sw.model import SwDocument
+from pc2bs.model import SwDocument
 
 
 def write_sw(doc: SwDocument, path: str | Path, *, libver: str = "earliest") -> None:

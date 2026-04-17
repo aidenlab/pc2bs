@@ -6,9 +6,9 @@ import h5py
 import numpy as np
 import pytest
 
-from pc2sw.convert import pointcloud_to_ballstick
-from pc2sw.read import read_sw
-from pc2sw.write import write_sw
+from pc2bs.convert import pointcloud_to_ballstick
+from pc2bs.read import read_sw
+from pc2bs.write import write_sw
 
 DATA = Path(__file__).resolve().parents[2] / "data"
 POINTCLOUD = DATA / "pointcloud" / "multiple-traces-multiple-genomic-locations.sw"

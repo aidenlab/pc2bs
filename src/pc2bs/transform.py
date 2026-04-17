@@ -4,7 +4,7 @@ import copy
 
 import numpy as np
 
-from pc2sw.model import Ensemble, SwDocument, SwHeader, n_regions_from_regions
+from pc2bs.model import Ensemble, SwDocument, SwHeader, n_regions_from_regions
 
 
 def _bbox_centroid(xyz: np.ndarray) -> np.ndarray:

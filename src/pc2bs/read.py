@@ -5,8 +5,8 @@ from pathlib import Path
 import h5py
 import numpy as np
 
-from pc2sw.layout import ensemble_keys, header_group, infer_point_mode_from_trace, read_point_mode, trace_dataset_names
-from pc2sw.model import Ensemble, SwDocument, SwHeader, n_regions_from_regions
+from pc2bs.layout import ensemble_keys, header_group, infer_point_mode_from_trace, read_point_mode, trace_dataset_names
+from pc2bs.model import Ensemble, SwDocument, SwHeader, n_regions_from_regions
 
 
 def read_sw(path: str | Path) -> SwDocument:

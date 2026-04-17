@@ -3,9 +3,9 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-from pc2sw.read import read_sw
-from pc2sw.transform import to_ballstick
-from pc2sw.write import write_sw
+from pc2bs.read import read_sw
+from pc2bs.transform import to_ballstick
+from pc2bs.write import write_sw
 
 
 def pointcloud_to_ballstick(src_path: str | Path, dst_path: str | Path) -> None:
@@ -25,7 +25,7 @@ def pointcloud_to_ballstick(src_path: str | Path, dst_path: str | Path) -> None:
 def resolve_stdio_path(path: str, *, is_input: bool) -> tuple[str, tempfile.TemporaryDirectory | None]:
     if path != "-":
         return path, None
-    tmp = tempfile.TemporaryDirectory(prefix="pc2sw-")
+    tmp = tempfile.TemporaryDirectory(prefix="pc2bs-")
     name = "stdin.sw" if is_input else "stdout.sw"
     p = Path(tmp.name) / name
     if is_input:
