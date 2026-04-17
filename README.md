@@ -9,74 +9,80 @@ The tool reads and writes [HDF5](https://www.hdfgroup.org/solutions/hdf5/) using
 ## What you need first
 
 - **macOS or Linux** (or Windows with WSL; these instructions assume a Unix-style shell).
-- **Internet access** the first time you install dependencies (h5py, numpy).
+- **Python 3.10 or newer** (`python3 --version`).
+- **Internet access** the first time you install dependencies (`h5py`, `numpy`).
 - A **copy of this repository** on your machine (clone with Git, or download and unpack a ZIP).
 
-You do **not** need Conda, Anaconda, or a manually managed virtual environment for normal use. The instructions below use **pipx**, which installs the tool in an isolated environment and puts a single `pc2bs` command on your `PATH`.
+You only need **pipx** if you choose the pipx install path below. If you already use **Conda**, a **virtualenv**, or **system/user `pip`**, use [Option A](#option-a-install-with-pip-into-an-environment-you-already-use) and skip pipx entirely.
 
 ---
 
-## Install pipx (one-time)
+## Choose how to install
 
-### macOS (Homebrew)
+### Option A: Install with `pip` into an environment you already use
 
-If you use [Homebrew](https://brew.sh/):
+Use this when you already have a Conda env, a `venv`, or a user-wide `pip install --user` setup and you are comfortable activating that environment (or keeping its `bin` directory on your `PATH`).
 
-```bash
-brew install pipx
-pipx ensurepath
-```
+1. **Activate** your Conda environment, **or** create/activate a venv:
 
-`pipx ensurepath` adds pipx’s binary directory (usually `~/.local/bin`) to your shell configuration. **Close the terminal window and open a new one** after this step (or run `source ~/.zshrc` / `source ~/.bashrc`, depending on your shell).
+   ```bash
+   python3 -m venv ~/.venvs/pc2bs
+   source ~/.venvs/pc2bs/bin/activate
+   ```
 
-### Any system (official installer)
+2. **Install dependencies** (if they are not already present). Either let `pip` pull them in as dependencies of `pc2bs`, or install explicitly, for example:
 
-If you do not use Homebrew, follow the official **pipx** installation guide:
+   ```bash
+   python3 -m pip install "h5py>=3.10" "numpy>=1.24"
+   ```
 
-https://pipx.pypa.io/stable/installation/
+3. **Install this project** from the repository root (the directory that contains `pyproject.toml`):
 
-After installation, run:
+   ```bash
+   cd /path/to/pc2bs
+   python3 -m pip install -e .
+   ```
 
-```bash
-pipx ensurepath
-```
+   The `-e` (editable) flag means `git pull` updates the code immediately; if **dependencies** in `pyproject.toml` change, run `pip install -e .` again (or `pip install --force-reinstall -e .`) in that same environment—see [Updating your installation](#updating-your-installation).
 
-and restart the terminal (or `source` your shell rc file) as above.
-
-### Check that pipx works
-
-```bash
-pipx --version
-```
-
-If you see a version number, you are ready for the next step.
-
----
-
-## Install pc2bs with pipx (recommended)
-
-Replace the path below with the **actual** path to your copy of this repository (the folder that contains `pyproject.toml`).
-
-```bash
-pipx install -e /path/to/pc2bs
-```
-
-Example if the project lives in your home directory:
-
-```bash
-pipx install -e "$HOME/SpacewalkDevelopment/pc2bs"
-```
-
-The `-e` flag means “editable”: the `pc2bs` command runs the code from that folder. **Python code changes** take effect as soon as you update the files (for example after `git pull`). If **dependencies** in `pyproject.toml` change, you need one extra step—see [Updating your installation](#updating-your-installation).
-
-### Confirm the command is available
+4. **Run the tool** while that environment is active (or call the full path to the script, e.g. `~/.venvs/pc2bs/bin/pc2bs`).
 
 ```bash
 which pc2bs
 pc2bs --version
 ```
 
-You should see a path under your home directory (typically inside `.local/pipx/...`) and a version string.
+---
+
+### Option B: Install with **pipx** (optional, no existing env required)
+
+**pipx** is handy when you want a **single global `pc2bs` command** and a separate, automatic environment for this app—**you do not need pipx** if Option A already fits your workflow.
+
+Install pipx **only if** you choose this option:
+
+- **macOS (Homebrew):** `brew install pipx` then `pipx ensurepath`, then open a new terminal (or `source ~/.zshrc`).
+- **Other systems:** follow https://pipx.pypa.io/stable/installation/ and run `pipx ensurepath`.
+
+Then install **pc2bs** (replace the path with your clone):
+
+```bash
+pipx install -e /path/to/pc2bs
+```
+
+Example:
+
+```bash
+pipx install -e "$HOME/SpacewalkDevelopment/pc2bs"
+```
+
+Confirm:
+
+```bash
+which pc2bs
+pc2bs --version
+```
+
+You should see a path under your home directory (often under `.local/pipx/...`) and a version string.
 
 ---
 
@@ -123,7 +129,29 @@ python3 -m pc2bs --version
 
 This project will get **revisions, new features, and bug fixes**. How you update depends on how you installed `pc2bs`.
 
-### Case 1: You used `pipx install -e` on a local Git clone (the path in this README)
+### Case 1: You used `pip install -e` (Conda, venv, or user `pip`)
+
+1. **Activate** the same environment you used when installing.
+
+2. Update the source and reinstall metadata when needed:
+
+   ```bash
+   cd /path/to/pc2bs
+   git pull
+   python3 -m pip install -e .
+   ```
+
+   Use `pip install --force-reinstall -e .` if dependencies in `pyproject.toml` changed and you want a clean refresh.
+
+3. Check the version string:
+
+   ```bash
+   pc2bs --version
+   ```
+
+---
+
+### Case 2: You used `pipx install -e` on a local Git clone
 
 You pointed pipx at a folder on disk (for example `~/SpacewalkDevelopment/pc2bs`) and used the `-e` (editable) flag.
 
@@ -158,7 +186,7 @@ pipx install --force -e /path/to/pc2bs
 
 ---
 
-### Case 2: You installed directly from GitHub with pipx (no local clone)
+### Case 3: You installed directly from GitHub with pipx (no local clone)
 
 Example first-time install:
 
@@ -182,7 +210,7 @@ Then run `pc2bs --version` again.
 
 ---
 
-### Case 3: You installed a non-editable copy from a local path (no `-e`)
+### Case 4: You installed a non-editable copy from a local path with pipx (no `-e`)
 
 Re-run install with `--force` so pipx rebuilds the environment from that path:
 
@@ -194,11 +222,8 @@ pipx install --force /path/to/pc2bs
 
 ## Uninstall
 
-To remove the tool completely:
-
-```bash
-pipx uninstall pc2bs
-```
+- **pipx:** `pipx uninstall pc2bs`
+- **pip** (the environment where you ran `pip install -e .`): `python3 -m pip uninstall pc2bs`
 
 ---
 
@@ -206,25 +231,24 @@ pipx uninstall pc2bs
 
 ### `pc2bs: command not found`
 
-1. Run `pipx ensurepath`, then **open a new terminal**.
-2. Check that `~/.local/bin` (or the path pipx printed) appears in your `PATH`:
-
-   ```bash
-   echo "$PATH"
-   ```
-
-3. Run `which pc2bs` again.
+- If you installed with **venv or Conda**, activate that environment first, or call the executable by full path (for example `~/.venvs/pc2bs/bin/pc2bs`).
+- If you used **`pip install --user`**, ensure `~/.local/bin` is on your `PATH`.
+- If you used **pipx**, run `pipx ensurepath`, open a new terminal, and confirm `~/.local/bin` appears in `echo "$PATH"`.
 
 ### `pipx: command not found`
 
-pipx is not installed or not on your `PATH`. Complete the **Install pipx** section above.
+You only need pipx if you chose **Option B**. Otherwise use **Option A** with `pip` in an environment you already have.
 
 ### Errors about HDF5 or missing modules
 
-The `pipx` install pulls in **h5py** and **numpy** automatically. If something failed during install, try:
+Reinstall so dependencies are applied:
 
 ```bash
+# pipx
 pipx install --force -e /path/to/pc2bs
+
+# or, in your venv / conda env
+cd /path/to/pc2bs && python3 -m pip install --force-reinstall -e .
 ```
 
 ### Spacewalk still will not open the output file
@@ -265,13 +289,12 @@ The **Python package version** (what `pc2bs --version` and `pip show pc2bs` repo
 
 3. On GitHub, create a **Release** from that tag (the release “name” is usually the same as the tag).
 
-4. Anyone who installed with **pipx** should refresh so the new version is baked into pipx’s metadata (especially after a new tag):
+4. After a **new tag**, refresh the install so the **reported version** (`pc2bs --version`, `pip show pc2bs`) matches Git metadata:
 
-   ```bash
-   pipx reinstall pc2bs
-   ```
+   - **pipx:** `pipx reinstall pc2bs`
+   - **venv / Conda / `pip install -e`:** from the repo root, with the env activated: `python3 -m pip install -e .` (or `--force-reinstall -e .` if you want a full refresh)
 
-   Editable installs (`pipx install -e …`) pick up **code** changes on `git pull` immediately, but the **reported version string** only updates after metadata is regenerated—`pipx reinstall pc2bs` does that.
+   Editable installs pick up **code** changes on `git pull` immediately, but the **version string** only updates after metadata is regenerated—run one of the commands above after pulling **new tags**.
 
 If you run from a checkout **without** installing the package (`pip install -e .` / pipx), `pc2bs --version` may show `0.0.0+not-installed`; use a normal install for a meaningful version.
 
