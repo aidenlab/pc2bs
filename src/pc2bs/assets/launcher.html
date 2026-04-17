@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>pc2bs &rarr; Spacewalk</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: system-ui, -apple-system, sans-serif; max-width: 40rem; margin: 3rem auto; padding: 0 1rem; line-height: 1.5; }
+  h1 { font-size: 1.3rem; margin: 0 0 0.5rem 0; }
+  code { background: rgba(127,127,127,0.2); padding: 0.05rem 0.3rem; border-radius: 0.2rem; }
+  #status { margin: 1rem 0; padding: 0.75rem 1rem; border-radius: 0.3rem; background: rgba(127,127,127,0.12); }
+  button { font: inherit; padding: 0.6rem 1.1rem; cursor: pointer; }
+  .err { color: #b00020; }
+</style>
+</head>
+<body>
+<h1>pc2bs &rarr; Spacewalk</h1>
+<p>Handing off <code id="fn"></code> to Spacewalk.</p>
+<div id="status">Opening Spacewalk&hellip;</div>
+<button id="openbtn" hidden>Open Spacewalk</button>
+
+<script>
+const SPACEWALK_URL = "__SPACEWALK_URL__";
+const FILE_URL      = "__FILE_URL__";
+const FILENAME      = "__FILENAME__";
+
+const statusEl = document.getElementById("status");
+const btn      = document.getElementById("openbtn");
+document.getElementById("fn").textContent = FILENAME;
+
+let handed = false;
+
+async function handOff(win) {
+  try {
+    statusEl.textContent = "Waiting for Spacewalk to finish initializing\u2026";
+    await new Promise((resolve) => {
+      const onMsg = (e) => {
+        if (e.source === win && e.data && e.data.type === "spacewalk-ready") {
+          window.removeEventListener("message", onMsg);
+          resolve();
+        }
+      };
+      window.addEventListener("message", onMsg);
+    });
+
+    statusEl.textContent = "Sending file to Spacewalk\u2026";
+    const buf = await (await fetch(FILE_URL)).arrayBuffer();
+    win.postMessage(
+      { type: "spacewalk-load", bytes: new Uint8Array(buf), filename: FILENAME },
+      "*"
+    );
+
+    handed = true;
+    statusEl.textContent = "File sent. You can close this tab.";
+    statusEl.classList.remove("err");
+    fetch("/done", { method: "POST" }).catch(() => {});
+  } catch (err) {
+    statusEl.textContent = "Error: " + (err && err.message ? err.message : err);
+    statusEl.classList.add("err");
+  }
+}
+
+function tryOpen() {
+  const win = window.open(SPACEWALK_URL);
+  if (!win) {
+    statusEl.textContent = "Your browser blocked the popup. Click below to continue.";
+    statusEl.classList.add("err");
+    btn.hidden = false;
+    return;
+  }
+  btn.hidden = true;
+  statusEl.classList.remove("err");
+  handOff(win);
+}
+
+btn.addEventListener("click", tryOpen);
+tryOpen();
+
+setTimeout(() => {
+  if (!handed) {
+    statusEl.textContent = "Timed out waiting for Spacewalk. Make sure the tab opened and try again.";
+    statusEl.classList.add("err");
+    btn.hidden = false;
+  }
+}, 90000);
+</script>
+</body>
+</html>
