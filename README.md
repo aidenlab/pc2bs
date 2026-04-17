@@ -76,6 +76,24 @@ pc2bs - OUTPUT.sw < INPUT.sw
 pc2bs INPUT.sw - > OUTPUT.sw
 ```
 
+### Open the result in Spacewalk
+
+Pass `--open` to hand the converted file off to the [Spacewalk](https://aidenlab.org/spacewalk/) web app in your default browser:
+
+```bash
+pc2bs --open INPUT.sw OUTPUT.sw
+```
+
+pc2bs writes `OUTPUT.sw`, starts a short-lived local web server, and opens a launcher page that uses Spacewalk's `postMessage` protocol (`spacewalk-ready` / `spacewalk-load`) to transfer the file in-memory — no upload and no drag-and-drop. If your browser blocks the pop-up, the launcher page shows a one-click button to continue.
+
+Override the Spacewalk URL (for a self-hosted build, for example) with `--spacewalk-url`:
+
+```bash
+pc2bs --open --spacewalk-url http://localhost:5173/ INPUT.sw OUTPUT.sw
+```
+
+`--open` is incompatible with `OUTPUT = -` (the browser needs a real file to hand off).
+
 ---
 
 ## Updating

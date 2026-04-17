@@ -22,6 +22,9 @@ where = ["src"]
 [tool.setuptools.package-dir]
 "" = "src"
 
+[tool.setuptools.package-data]
+pc2bs = ["assets/*.html"]
+
 [tool.setuptools_scm]
 # Derive version from Git tags (e.g. v0.2.0). Untagged commits get a dev suffix.
 

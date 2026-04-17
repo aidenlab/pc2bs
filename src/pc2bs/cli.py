@@ -7,6 +7,7 @@ from pathlib import Path
 
 from pc2bs import __version__
 from pc2bs.convert import pointcloud_to_ballstick, resolve_stdio_path
+from pc2bs.launch import DEFAULT_SPACEWALK_URL, launch_in_spacewalk
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -31,6 +32,17 @@ def _build_parser() -> argparse.ArgumentParser:
         metavar="OUTPUT",
         help="Output ball-and-stick .sw path, or '-' to write to standard output.",
     )
+    p.add_argument(
+        "--open",
+        action="store_true",
+        help="After writing OUTPUT, open it in Spacewalk via the default browser.",
+    )
+    p.add_argument(
+        "--spacewalk-url",
+        default=DEFAULT_SPACEWALK_URL,
+        metavar="URL",
+        help=f"Spacewalk URL to open (default: {DEFAULT_SPACEWALK_URL}).",
+    )
     return p
 
 
@@ -38,6 +50,10 @@ def main(argv: list[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
 
     quiet = args.quiet
+    if args.open and args.output == "-":
+        print("pc2bs: error: --open is incompatible with OUTPUT='-'", file=sys.stderr)
+        return 2
+
     tmp_in: tempfile.TemporaryDirectory | None = None
     tmp_out: tempfile.TemporaryDirectory | None = None
     try:
@@ -55,6 +71,13 @@ def main(argv: list[str] | None = None) -> int:
             sys.stdout.buffer.write(Path(out_path).read_bytes())
         elif not quiet:
             print(f"wrote {out_path}", file=sys.stderr)
+
+        if args.open:
+            if not quiet:
+                print("pc2bs: opening in Spacewalk\u2026", file=sys.stderr)
+            ok = launch_in_spacewalk(Path(out_path), spacewalk_url=args.spacewalk_url)
+            if not ok and not quiet:
+                print("pc2bs: warning: Spacewalk handoff timed out", file=sys.stderr)
 
         return 0
     except BrokenPipeError:
