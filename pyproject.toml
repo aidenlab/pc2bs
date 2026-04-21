@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=64", "setuptools-scm>=8"]
+requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "pc2bs"
-dynamic = ["version"]
+version = "0.1.0"
 description = "CLI: point-cloud Spacewalk .sw → ball-and-stick (h5py, one-way)."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -24,9 +24,6 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 pc2bs = ["assets/*.html"]
-
-[tool.setuptools_scm]
-# Derive version from Git tags (e.g. v0.2.0). Untagged commits get a dev suffix.
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0"]
