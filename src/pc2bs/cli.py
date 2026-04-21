@@ -38,6 +38,13 @@ def _build_parser() -> argparse.ArgumentParser:
         help="After writing OUTPUT, open it in Spacewalk via the default browser.",
     )
     p.add_argument(
+        "--no-index",
+        dest="index",
+        action="store_false",
+        help="Do not append an hdf5-indexer _index dataset to OUTPUT.",
+    )
+    p.set_defaults(index=True)
+    p.add_argument(
         "--spacewalk-url",
         default=DEFAULT_SPACEWALK_URL,
         metavar="URL",
@@ -65,7 +72,7 @@ def main(argv: list[str] | None = None) -> int:
         else:
             out_path = args.output
 
-        pointcloud_to_ballstick(in_path, out_path)
+        pointcloud_to_ballstick(in_path, out_path, index=args.index)
 
         if out_is_dash:
             sys.stdout.buffer.write(Path(out_path).read_bytes())

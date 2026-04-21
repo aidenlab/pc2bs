@@ -11,6 +11,7 @@ requires-python = ">=3.10"
 dependencies = [
     "h5py>=3.10",
     "numpy>=1.24",
+    "hdf5-indexer @ git+https://github.com/jrobinso/hdf5-indexer",
 ]
 
 [project.scripts]

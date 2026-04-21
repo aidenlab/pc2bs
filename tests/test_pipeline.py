@@ -35,8 +35,16 @@ def test_pointcloud_to_ballstick_cli_path(tmp_path: Path) -> None:
     assert doc.effective_point_mode() == "single_point"
     assert doc.ensembles[0].traces["t_0"].shape == (9, 3)
     with h5py.File(out, "r") as f:
-        assert "_index" not in f
+        assert "_index" in f
         assert {"Header", "PGP1"} <= set(f.keys())
+
+
+@pytest.mark.skipif(not POINTCLOUD.is_file(), reason="sample .sw not present")
+def test_pointcloud_to_ballstick_no_index(tmp_path: Path) -> None:
+    out = tmp_path / "bs.sw"
+    pointcloud_to_ballstick(POINTCLOUD, out, index=False)
+    with h5py.File(out, "r") as f:
+        assert "_index" not in f
 
 
 @pytest.mark.skipif(not POINTCLOUD.is_file(), reason="sample .sw not present")
