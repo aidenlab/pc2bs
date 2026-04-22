@@ -53,3 +53,28 @@ def test_rejects_ballstick_input(tmp_path: Path) -> None:
     pointcloud_to_ballstick(POINTCLOUD, bs)
     with pytest.raises(ValueError, match="only converts point-cloud"):
         pointcloud_to_ballstick(bs, tmp_path / "out.sw")
+
+
+@pytest.mark.skipif(not POINTCLOUD.is_file(), reason="sample .sw not present")
+def test_ballstick_output_includes_live_contact_map_vertices_bake(tmp_path: Path) -> None:
+    out = tmp_path / "bs.sw"
+    pointcloud_to_ballstick(POINTCLOUD, out)
+
+    doc = read_sw(out)
+    ensemble = doc.ensembles[0]
+    trace_names = sorted(ensemble.traces.keys(), key=lambda n: int(n[2:]) if n[2:].isdigit() else n)
+    trace_count = len(trace_names)
+    trace_length = ensemble.traces[trace_names[0]].shape[0]
+
+    with h5py.File(out, "r") as f:
+        assert f["Header"].attrs["live_contact_map_vertices_version"] == 1
+        bake = f[ensemble.name]["live_contact_map_vertices"]
+        assert bake.shape == (trace_count, trace_length, 3)
+        assert bake.dtype == np.float32
+
+        # Bake must match the per-trace datasets exactly (same source data,
+        # just restructured; NaN positions preserved).
+        baked = bake[...]
+        for i, name in enumerate(trace_names):
+            t = np.asarray(ensemble.traces[name], dtype=np.float32)
+            assert np.array_equal(baked[i], t, equal_nan=True)
